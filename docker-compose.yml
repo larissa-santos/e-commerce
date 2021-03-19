@@ -1,0 +1,52 @@
+version: "3"
+services:
+  app:
+    image: ambientum/php:7.4-nginx
+    container_name: ecommerce-app
+    volumes:
+      - .:/var/www/app
+      - dot-config:/home/ambientum/.config
+      - dot-cache:/home/ambientum/.cache
+      - dot-local:/home/ambientum/.local
+      - dot-composer:/home/ambientum/.composer
+    environment:
+      - FRAMEWORK=laravel
+      - XDEBUG_ENABLED=true
+    ports:
+      - "8090:8080"
+      - "443:8083"
+    networks:
+      - ecommerce
+
+  db:
+    image: mysql:5.7
+    container_name: ecommerce-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - ecommerce
+
+volumes:
+  dot-config:
+    driver: local
+
+  dot-cache:
+    driver: local
+
+  dot-local:
+    driver: local
+
+  dot-composer:
+    driver: local
+
+networks:
+  ecommerce:
+    driver: bridge
