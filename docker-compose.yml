@@ -18,10 +18,11 @@ services:
     networks:
       - ecommerce
 
-  db:
+  mysql:
     image: mysql:5.7
     container_name: ecommerce-db
     restart: unless-stopped
+    command: --sql_mode="NO_ENGINE_SUBSTITUTION"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -30,11 +31,16 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
+      - mysql-data:/var/lib/mysql
       - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
     networks:
       - ecommerce
 
 volumes:
+  mysql-data:
+    
   dot-config:
     driver: local
 
